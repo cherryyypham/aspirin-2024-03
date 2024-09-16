@@ -1,4 +1,20 @@
+/*!
+    traffic_light.rs
+
+    Implement a traffic light algorithm.
+*/
+
+/// Prints numbers from 1 to `max_num`, with certain exceptions:
+/// * For multiples of 3, it prints "Fizz".
+/// * For multiples of 5, it prints "Buzz".
+/// * For multiples of both 3 and 5, it prints "FizzBuzz".
+///
+/// # Arguments
+///
+/// `max_num` - A positive integer (`u32`) that specifies the upper limit of the range to print.
+///
 #[derive(Debug, PartialEq, Copy, Clone)]
+
 enum TrafficLightColor {
     Red,
     Yellow,
@@ -6,18 +22,69 @@ enum TrafficLightColor {
 }
 
 #[derive(Debug, Copy, Clone)]
+
 struct TrafficLightState {
     current_color: TrafficLightColor,
     last_transition_time_ms: u32,
 }
 
-fn get_next_color(state: TrafficLightState) -> TrafficLightColor {}
+// Wait time durations in milliseconds for each color
+const RED_DURATION: u32 = 25000;
+const YELLOW_DURATION: u32 = 5000;
+const GREEN_DURATION: u32 = 30000;
+const PEDESTRIAN_GREEN_DURATION: u32 = 20000;
 
+/// Fetch the next color of the traffic light based on the current color
+///
+/// # Arguments
+/// * `state` - The current state of the traffic light
+///
+/// # Returns
+/// * The next color of the traffic light
+fn get_next_color(state: TrafficLightState) -> TrafficLightColor {
+    match state.current_color {
+        TrafficLightColor::Red => TrafficLightColor::Green,
+        TrafficLightColor::Yellow => TrafficLightColor::Red,
+        TrafficLightColor::Green => TrafficLightColor::Yellow,
+    }
+}
+
+/// Get the next state of the traffic light, potentially accounting for pedestrian requests.
+///
+/// # Arguments
+/// * `state` - The current traffic light state
+/// * `current_time_ms` - The current time in milliseconds
+/// * `pedestrian_walk_request` - Boolean flag indicating if there is a pedestrian request
+///
+/// # Returns
+/// * The updated `TrafficLightState` with the next color and last transition time
 fn get_next_state(
     state: TrafficLightState,
     current_time_ms: u32,
     pedestrian_walk_request: bool,
 ) -> TrafficLightColor {
+    let time_elapsed = current_time_ms - state.last_transition_time_ms;
+
+    let (required_time, next_color) = match state.current_color {
+        TrafficLightColor::Red => (RED_DURATION, TrafficLightColor::Green),
+        TrafficLightColor::Yellow => (YELLOW_DURATION, TrafficLightColor::Red),
+        TrafficLightColor::Green => {
+            let duration = if pedestrian_walk_request {
+                PEDESTRIAN_GREEN_DURATION
+            } else {
+                GREEN_DURATION
+            };
+            (duration, TrafficLightColor::Yellow)
+        }
+    };
+
+    if time_elapsed >= required_time {
+        // If the required time has passed, switch to the next color
+        next_color
+    } else {
+        // If not enough time has passed, return the same state
+        state.current_color
+    }
 }
 
 // Do not modify below here
