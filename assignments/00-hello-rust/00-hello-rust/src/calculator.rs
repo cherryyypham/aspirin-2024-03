@@ -1,3 +1,8 @@
+/*!
+    calculator.rs
+
+    This file contains the implementation of the calculator program with basic logic operations and different bases for these operations.
+*/
 use std::io;
 
 #[derive(Debug, Clone, Copy)]
