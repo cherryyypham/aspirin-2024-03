@@ -1,23 +1,106 @@
-use std::collections::HashMap;
+#[allow(dead_code)]
+fn longest_equal_sequence_prescriptive<T: PartialEq>(sequence: &[T]) -> i32 {
+    if sequence.is_empty() {
+        return 0;
+    }
 
-fn longest_equal_sequence_prescriptive(sequence) -> i32 {
-    todo!()
+    let mut max_len = 1;
+    let mut current_len = 1;
+
+    for i in 1..sequence.len() {
+        if sequence[i] == sequence[i - 1] {
+            current_len += 1;
+        } else {
+            max_len = max_len.max(current_len);
+            current_len = 1;
+        }
+    }
+    max_len.max(current_len)
 }
 
-fn longest_equal_sequence_functional(sequence) -> i32 {
-    todo!()
+#[allow(dead_code)]
+fn longest_equal_sequence_functional<T: PartialEq>(sequence: &[T]) -> i32 {
+    if sequence.is_empty() {
+        return 0;
+    }
+
+    sequence
+        .iter()
+        .zip(sequence.iter().skip(1))
+        .map(|(a, b)| if a == b { 1 } else { 0 })
+        .fold((1, 1), |(max_len, current_len), equal| {
+            if equal == 1 {
+                (max_len.max(current_len + 1), current_len + 1)
+            } else {
+                (max_len.max(current_len), 1)
+            }
+        })
+        .0
 }
 
+#[allow(dead_code)]
 fn is_valid_paranthesis(paranthesis: &str) -> bool {
-    todo!()
+    let mut stack = Vec::new();
+    for c in paranthesis.chars() {
+        match c {
+            '(' | '{' | '[' => stack.push(c),
+            ')' => {
+                if stack.pop() != Some('(') {
+                    return false;
+                }
+            }
+            '}' => {
+                if stack.pop() != Some('{') {
+                    return false;
+                }
+            }
+            ']' => {
+                if stack.pop() != Some('[') {
+                    return false;
+                }
+            }
+            _ => return false,
+        }
+    }
+    stack.is_empty()
 }
 
-fn longest_common_substring<(first_str: &str, second_str: &str) -> &str {
-    todo!()
+#[allow(dead_code)]
+fn longest_common_substring<'a>(first_str: &'a str, second_str: &'a str) -> &'a str {
+    let mut longest_substring = "";
+
+    for i in 0..first_str.len() {
+        for j in i + 1..=first_str.len() {
+            let substring = &first_str[i..j];
+            if second_str.contains(substring) && substring.len() > longest_substring.len() {
+                longest_substring = substring;
+            }
+        }
+    }
+
+    longest_substring
 }
 
-fn longest_common_substring_multiple(strings: &[&str]) -> &str {
-    todo!()
+#[allow(dead_code)]
+fn longest_common_substring_multiple<'a>(strings: &'a [&str]) -> &'a str {
+    if strings.is_empty() {
+        return "";
+    }
+    let curr_string = strings[0];
+    let mut longest_substring = "";
+
+    for i in 0..curr_string.len() {
+        for j in i + 1..=curr_string.len() {
+            let substring = &curr_string[i..j];
+            if strings.iter().all(|s| s.contains(substring))
+                && substring.len() > longest_substring.len()
+            {
+                longest_substring = substring;
+            }
+        }
+    }
+
+    longest_substring
 }
 
 #[cfg(test)]

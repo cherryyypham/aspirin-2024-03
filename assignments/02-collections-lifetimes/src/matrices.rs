@@ -5,19 +5,59 @@ pub enum MatrixError {
     InvalidShape,
 }
 
-fn dot_product_prescriptive(vec1: &Vec<f64>, vec2: &Vec<f64>) -> Result<f64, MatrixError> {
-    todo!()
+#[allow(dead_code)]
+fn dot_product_prescriptive(vec1: &[f64], vec2: &[f64]) -> Result<f64, MatrixError> {
+    let m = vec1.len();
+    let n = vec2.len();
+    if m == 0 || n == 0 {
+        return Err(MatrixError::EmptyVector);
+    } else if m != n {
+        return Err(MatrixError::DimensionMismatch);
+    }
+    let mut result = 0.0;
+    for i in 0..vec1.len() {
+        result += vec1[i] * vec2[i];
+    }
+    Ok(result)
 }
 
-fn dot_product_functional(vec1: &Vec<f64>, vec2: &Vec<f64>) -> Result<f64, MatrixError> {
-    todo!()
+#[allow(dead_code)]
+fn dot_product_functional(vec1: &[f64], vec2: &[f64]) -> Result<f64, MatrixError> {
+    if vec1.is_empty() || vec2.is_empty() {
+        return Err(MatrixError::EmptyVector);
+    } else if vec1.len() != vec2.len() {
+        return Err(MatrixError::DimensionMismatch);
+    }
+    let result = vec1.iter().zip(vec2.iter()).map(|(a, b)| a * b).sum();
+
+    Ok(result)
 }
 
-fn multiply_matrices(
-    vec1: &Vec<Vec<f64>>,
-    vec2: &Vec<Vec<f64>>,
-) -> Result<Vec<Vec<f64>>, MatrixError> {
-    todo!()
+#[allow(dead_code)]
+fn multiply_matrices(vec1: &[Vec<f64>], vec2: &[Vec<f64>]) -> Result<Vec<Vec<f64>>, MatrixError> {
+    if vec1.is_empty() || vec2.is_empty() {
+        return Err(MatrixError::EmptyVector);
+    }
+
+    let col_vec1 = vec1[0].len();
+    let col_vec2 = vec2[0].len();
+    if vec1.iter().any(|row| row.len() != col_vec1) || vec2.iter().any(|row| row.len() != col_vec2)
+    {
+        return Err(MatrixError::InvalidShape);
+    }
+
+    if col_vec1 != vec2.len() {
+        return Err(MatrixError::DimensionMismatch);
+    }
+
+    let mut result = vec![vec![0.0; col_vec2]; vec1.len()];
+    for i in 0..vec1.len() {
+        for j in 0..col_vec2 {
+            result[i][j] = (0..col_vec1).map(|k| vec1[i][k] * vec2[k][j]).sum();
+        }
+    }
+
+    Ok(result)
 }
 
 #[cfg(test)]
