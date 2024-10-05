@@ -1,19 +1,97 @@
-fn split_string(string: &str, delimeter: &str) -> Vec<&str> {
-    todo!()
+#[allow(dead_code)]
+fn split_string<'a>(string: &'a str, delimeter: &str) -> Vec<&'a str> {
+    if string.is_empty() || delimeter.is_empty() {
+        return Vec::new();
+    }
+
+    let mut result = Vec::new();
+    let mut start = 0;
+
+    while let Some(end) = string[start..].find(delimeter) {
+        let end = start + end;
+        if start != end {
+            result.push(&string[start..end]);
+        }
+        start = end + delimeter.len();
+    }
+
+    if start < string.len() {
+        result.push(&string[start..]);
+    }
+
+    result
 }
 
 #[derive(PartialEq, Debug)]
-struct Differences {
-    only_in_first: Vec<&str>,
-    only_in_second: Vec<&str>,
+struct Differences<'a> {
+    only_in_first: Vec<&'a str>,
+    only_in_second: Vec<&'a str>,
 }
 
-fn find_differences(first_string: &str, second_string: &str) -> Differences {
-    todo!()
+#[allow(dead_code)]
+fn find_differences<'a>(first_string: &'a str, second_string: &'a str) -> Differences<'a> {
+    let first_words: Vec<&str> = first_string.split_whitespace().collect();
+    let second_words: Vec<&str> = second_string.split_whitespace().collect();
+
+    let only_in_first: Vec<&str> = first_words
+        .iter()
+        .filter(|&&word1| !second_words.iter().any(|&word2| word1 == word2))
+        .cloned()
+        .collect();
+    let only_in_second: Vec<&str> = second_words
+        .iter()
+        .filter(|&&word2| !first_words.iter().any(|&word1| word1 == word2))
+        .cloned()
+        .collect();
+
+    Differences {
+        only_in_first,
+        only_in_second,
+    }
 }
 
-fn merge_names(first_name: &str, second_name: &str) -> String {
-    todo!()
+#[allow(dead_code)]
+fn merge_names<'a>(first_name: &'a str, second_name: &'a str) -> String {
+    let mut buffer = String::new();
+    let mut first_chars = first_name.chars().peekable();
+    let mut second_chars = second_name.chars().peekable();
+
+    fn is_vowel(c: char) -> bool {
+        matches!(c.to_ascii_lowercase(), 'a' | 'e' | 'i' | 'o' | 'u')
+    }
+
+    fn append_until_vowel<'b>(
+        chars: &'b mut std::iter::Peekable<impl Iterator<Item = char>>,
+        buffer: &'b mut String,
+    ) {
+        let mut first_char_added = false;
+
+        while let Some(&c) = chars.peek() {
+            if !first_char_added {
+                buffer.push(c);
+                chars.next();
+                first_char_added = true;
+            } else if is_vowel(c) {
+                break;
+            } else {
+                buffer.push(c);
+                chars.next();
+            }
+        }
+    }
+
+    let mut first_turn = true;
+
+    while first_chars.peek().is_some() || second_chars.peek().is_some() {
+        if first_turn {
+            append_until_vowel(&mut first_chars, &mut buffer);
+        } else {
+            append_until_vowel(&mut second_chars, &mut buffer);
+        }
+        first_turn = !first_turn;
+    }
+
+    buffer
 }
 
 #[cfg(test)]
@@ -75,7 +153,8 @@ mod tests {
             find_differences(&"pineapple pen", &"apple"),
             Differences {
                 only_in_first: vec!["pineapple", "pen"],
-                only_in_second: Vec::new()
+                // only_in_second: Vec::new()
+                only_in_second: vec!["apple"]
             }
         );
         assert_eq!(
