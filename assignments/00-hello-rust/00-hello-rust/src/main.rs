@@ -1,3 +1,8 @@
+/*!
+    main.rs
+
+    This file runs programs for assignment 0.
+*/
 #![allow(dead_code)]
 
 mod calculator;
@@ -7,5 +12,4 @@ mod traffic_light;
 mod university;
 
 fn main() {
-    println!("Hello world!");
 }
