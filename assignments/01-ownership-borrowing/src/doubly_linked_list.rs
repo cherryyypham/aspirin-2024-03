@@ -11,19 +11,28 @@ type Link = Option<Box<Node>>;
 
 pub struct LinkedStack {
     head: Link,
-    tail: Link,
+    // tail: Link,
 }
 
 impl LinkedStack {
     fn new() -> Self {
-        todo!();
+        Self { head: None }
     }
 
     fn push(&mut self, val: i32) {
-        todo!()
+        let node = Box::new(Node {
+            val,
+            next: None,
+            prev: self.head.take(),
+        });
+
+        self.head = Some(node);
     }
 
     fn pop(&mut self) -> Option<i32> {
-        todo!();
+        self.head.take().map(|mut old_head| {
+            self.head = old_head.prev.take();
+            old_head.val
+        })
     }
 }
